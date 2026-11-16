@@ -5,9 +5,6 @@
 A product concept and clickable prototype I built for the Flipkart APM '29 case round (October 2026).
 
 **Live demo:** https://himank09.github.io/SochKart/
-**Case study (2-pager + appendix):** [case/Sochkart_case_study.pdf](case/Sochkart_case_study.pdf)
-
-![Paused order with its Soch Score](screenshots/soch-score.png)
 
 ## The problem
 
