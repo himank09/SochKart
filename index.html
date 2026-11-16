@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sochkart</title>
+  <style>
+/* Colours */
+:root {
+  --blue: #2874f0;
+  --yellow: #ffe11b;
+  --orange: #fb641b;
+  --green: #388e3c;
+  --red: #d32f2f;
+  --amber: #e9a100;
+  --bg: #f1f3f6;
+  --card: #fff;
+  --text: #212121;
+  --grey: #878787;
+  --line: #e0e0e0;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: Inter, Roboto, "Segoe UI", Arial, sans-serif;
+  color: var(--text);
+  background: #dfe6f3;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 56px;
+  padding: 24px;
+}
+
+button { font: inherit; cursor: pointer; border: 0; background: none; color: inherit; }
+
+/* Intro text beside the phone */
+.intro { max-width: 260px; }
+.intro h1 { font-size: 40px; color: var(--blue); font-style: italic; }
+.intro .tagline { font-size: 18px; font-weight: 600; margin: 4px 0 12px; }
+.intro p { color: #555; line-height: 1.5; }
+.intro .note { font-size: 12px; margin-top: 18px; color: var(--grey); }
+
+/* Phone frame and top bar */
+.phone {
+  position: relative;
+  width: 380px;
+  height: 780px;
+  background: var(--bg);
+  border: 9px solid #1c1c1c;
+  border-radius: 36px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 60px rgba(20, 40, 90, .25);
+}
+
+.topbar {
+  background: var(--blue);
+  color: #fff;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+}
+.topbar .logo {
+  width: 26px; height: 26px; border-radius: 6px;
+  background: var(--yellow); color: var(--blue);
+  font: italic 900 20px/26px Arial; text-align: center;
+}
+.topbar .title { font-weight: 700; font-size: 17px; flex: 1; }
+.topbar .time { font-size: 12px; opacity: .85; }
+.topbar .back { color: #fff; font-size: 20px; }
+
+.screen { flex: 1; overflow-y: auto; padding: 10px 10px 16px; }
+.screen::-webkit-scrollbar { width: 0; }
+
+.tabs { display: flex; background: #fff; border-top: 1px solid var(--line); }
+.tabs button {
+  flex: 1; padding: 7px 0 10px;
+  font-size: 11px; color: var(--grey);
+  display: flex; flex-direction: column; align-items: center; gap: 1px;
+}
+.tabs span { font-size: 18px; }
+.tabs .on { color: var(--blue); font-weight: 600; }
+
+/* Cards and text */
+.card { background: var(--card); border-radius: 8px; padding: 12px; margin-bottom: 10px; }
+.card h3 { font-size: 14px; margin-bottom: 6px; }
+.label { font-size: 11px; color: var(--grey); text-transform: uppercase; letter-spacing: .4px; }
+.muted { color: var(--grey); font-size: 12px; }
+.row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.big { font-size: 28px; font-weight: 700; }
+.good { color: var(--green); }
+.bad { color: var(--red); }
+.warn { color: var(--amber); }
+.hello { font-size: 13px; color: var(--grey); margin: 2px 2px 8px; }
+
+.pill { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; }
+.pill.red { background: #fdecea; color: var(--red); }
+.pill.green { background: #e8f5e9; color: var(--green); }
+.pill.amber { background: #fff4d6; color: #a06c00; }
+.pill.blue { background: #e7f0fe; color: var(--blue); }
+
+.btn { display: block; width: 100%; padding: 11px; border-radius: 4px; font-weight: 600; font-size: 14px; margin-top: 10px; }
+.btn.orange { background: var(--orange); color: #fff; }
+.btn.blue { background: var(--blue); color: #fff; }
+.btn.line { border: 1px solid var(--line); background: #fff; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+
+.list-item { display: flex; gap: 10px; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--line); }
+.list-item:last-child { border-bottom: 0; }
+.thumb { width: 40px; height: 40px; border-radius: 6px; background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 20px; flex: none; }
+.grow { flex: 1; min-width: 0; }
+.name { font-size: 13px; font-weight: 600; }
+.clickable { cursor: pointer; }
+
+/* Score ring */
+.score { display: flex; gap: 14px; align-items: center; }
+.ring { width: 84px; height: 84px; border-radius: 50%; display: grid; place-items: center; flex: none; }
+.ring div { width: 66px; height: 66px; border-radius: 50%; background: #fff; display: grid; place-items: center; text-align: center; }
+.ring b { font-size: 24px; display: block; line-height: 1; }
+.ring small { font-size: 10px; color: var(--grey); }
+
+.factor { padding: 8px 0; border-bottom: 1px solid var(--line); }
+.factor:last-child { border-bottom: 0; }
+.factor .why { font-size: 12px; color: #555; margin-top: 3px; line-height: 1.4; }
+.meter { height: 6px; background: var(--line); border-radius: 4px; margin-top: 5px; overflow: hidden; }
+.meter i { display: block; height: 100%; border-radius: 4px; }
+
+/* Basket */
+.check { width: 20px; height: 20px; border: 2px solid var(--grey); border-radius: 4px; flex: none; }
+.check.on { background: var(--blue); border-color: var(--blue); position: relative; }
+.check.on::after { content: "\2713"; color: #fff; font-size: 13px; position: absolute; left: 3px; top: -1px; }
+.cap { height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; margin: 6px 0 2px; }
+.cap i { display: block; height: 100%; background: var(--blue); }
+
+/* Security checks */
+.chain { display: flex; flex-direction: column; gap: 6px; }
+.step { display: flex; gap: 10px; align-items: center; font-size: 13px; }
+.dot { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; color: #fff; flex: none; }
+.dot.pass { background: var(--green); }
+.dot.fail { background: var(--red); }
+.dot.wait { background: var(--grey); }
+
+input[type=text], input[type=password] {
+  width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 4px;
+  font: inherit; font-size: 15px; margin-top: 8px;
+}
+
+/* Rules */
+.seg { display: flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; margin-top: 6px; }
+.seg button { flex: 1; padding: 6px 0; font-size: 12px; }
+.seg button + button { border-left: 1px solid var(--line); }
+.rule { padding: 10px 0; border-bottom: 1px solid var(--line); }
+.rule:first-of-type { padding-top: 2px; }
+.rule:last-of-type { border-bottom: 0; margin-bottom: 4px; }
+.seg .on { background: var(--blue); color: #fff; font-weight: 600; }
+input[type=range] { width: 100%; accent-color: var(--blue); }
+
+.toast {
+  position: absolute; left: 50%; bottom: 76px; transform: translateX(-50%);
+  background: #212121; color: #fff; font-size: 13px; padding: 9px 14px; border-radius: 6px;
+  opacity: 0; transition: opacity .25s; pointer-events: none; white-space: nowrap;
+}
+.toast.show { opacity: 1; }
+
+@media (max-width: 760px) {
+  body { padding: 0; }
+  .intro { display: none; }
+  .phone { width: 100%; height: 100vh; border: 0; border-radius: 0; }
+}
+</style>
+</head>
+<body>
+
+  <aside class="intro">
+    <h1>Sochkart</h1>
+    <p class="tagline">Soch ke, phir checkout.</p>
+    <p>Your agent does the shopping. You keep the final say.</p>
+  </aside>
+
+  <main class="phone">
+    <header class="topbar">
+      <button class="back" id="back" hidden>&larr;</button>
+      <span class="logo">f</span>
+      <span class="title" id="title">Sochkart</span>
+      <span class="time">9:41</span>
+    </header>
+
+    <section class="screen" id="screen"></section>
+
+    <nav class="tabs" id="tabs">
+      <button data-tab="home" class="on"><span>&#8962;</span>Home</button>
+      <button data-tab="basket"><span>&#9783;</span>Basket</button>
+      <button data-tab="security"><span>&#9672;</span>Security</button>
+      <button data-tab="data"><span>&#9673;</span>Data</button>
+      <button data-tab="rules"><span>&#9881;</span>Rules</button>
+    </nav>
+
+    <div class="toast" id="toast"></div>
+  </main>
+
+  <script>
+
+const rupee = n => '₹' + n.toLocaleString('en-IN');
+
+// Sample data
+
+const user = { name: 'Puneet', funBudget: 25000 };
+
+// Soch Score weights (editable on Rules)
+const weights = { need: 25, afford: 25, future: 15, impulse: 20, value: 15 };
+
+const factorInfo = {
+  need:    { title: 'Need or want?' },
+  afford:  { title: 'Affordable now?' },
+  future:  { title: 'Opportunity cost' },
+  impulse: { title: 'Impulse risk' },
+  value:   { title: 'Fair price?' }
+};
+
+// Each factor: 0 = bad, 1 = good
+const heldOrder = {
+  item: 'boAt Nirvana X Pro earbuds',
+  emoji: '🎧',
+  price: 14999,
+  mrp: 19990,
+  rating: 4.3,
+  addedAt: '1:40 AM',
+  note: 'Big Billion Days deal, ends in 10 min',
+  factors: {
+    need:    { v: 0.2,  why: 'A want. You already have working earbuds (bought Mar 2039).' },
+    afford:  { v: 0.3,  why: 'Uses 60% of this month\'s fun budget (₹25,000).' },
+    future:  { v: 0.4,  why: '₹14,999 invested at 12% for 10 years ≈ ₹46,600.' },
+    impulse: { v: 0.15, why: 'Added at 1:40 AM, during a 10-minute countdown.' },
+    value:   { v: 0.6,  why: 'Same model was ₹12,499 last month.' }
+  },
+  status: 'held'
+};
+
+const basket = {
+  cap: 3000,
+  staples: [
+    { name: 'Amul Taaza milk 2 L', emoji: '🥛', price: 136 },
+    { name: 'Harvest Gold bread', emoji: '🍞', price: 55 },
+    { name: 'Eggs, 12 pack', emoji: '🥚', price: 96 },
+    { name: 'Jio recharge, 28 days', emoji: '📶', price: 299 }
+  ],
+  review: [
+    { name: 'Amul Taaza milk 4 L', emoji: '🥛', price: 272, reason: 'Quantity doubled (usually 2 L)', ok: false },
+    { name: 'Protein bars, 12 pack', emoji: '🍫', price: 1140, reason: 'New item, suggested by your agent', ok: false },
+    { name: 'India Gate basmati 5 kg', emoji: '🍚', price: 720, reason: 'Price up 18% (was ₹610)', ok: false }
+  ],
+  blocked: { name: 'Flipkart Black trial, auto-renews', price: 1499 },
+  staplesOk: false,
+  confirmed: false
+};
+
+const threat = {
+  item: 'iPhone 17 Pro, 256 GB',
+  price: 139900,
+  where: 'New device, Pune',
+  at: '3:12 AM',
+  status: 'open' // open | challenge | blocked | allowed
+};
+
+const checkpoints = [
+  { name: 'Agent identity', detail: 'Order signed from a device you have never used', pass: false },
+  { name: 'Intent check', detail: 'You never asked for it. Not a staple. Soch Score 18', pass: false },
+  { name: 'Behaviour check', detail: '3:12 AM, new city, 9× your usual order size', pass: false },
+  { name: 'Random human check', detail: 'Waiting for you', pass: null },
+  { name: 'Payment gateway', detail: 'Payment on hold, nothing has left your account', pass: null },
+  { name: 'Delivery check', detail: 'New address held until you confirm', pass: null }
+];
+
+// One is picked at random
+const challenges = [
+  { ask: 'Type the exact amount of this order', answer: '139900', type: 'text' },
+  { ask: 'Enter your Soch passphrase (never stored in your agent)', answer: 'chai@2040', type: 'password', hint: 'Demo passphrase: chai@2040' },
+  { ask: 'Look at your phone for a face check', answer: null, type: 'face' }
+];
+
+const shared = [
+  { seller: 'RetailNet (earbuds)', name: 'Puneet K.', phone: '+91 98••• ••210', address: 'Token DLV-7Q2K' },
+  { seller: 'FreshMart (groceries)', name: 'Puneet K.', phone: '+91 98••• ••210', address: 'Token DLV-3M8P' },
+  { seller: 'BookNest (books)', name: 'Puneet K.', phone: 'Not shared', address: 'Token DLV-9X1A' }
+];
+
+const dataRequests = [
+  { who: "FreshMart's agent", asked: 'Your date of birth', offer: '₹40 off', blocked: true },
+  { who: "InsureCo's agent", asked: 'Step count from your watch', offer: 'Lower premium quote', blocked: true }
+];
+
+const categories = [
+  { name: 'Electronics', mode: 'Strict' },
+  { name: 'Fashion', mode: 'Strict' },
+  { name: 'Groceries', mode: 'Balanced' },
+  { name: 'Bills and recharges', mode: 'Relaxed' }
+];
+
+const modeHelp = {
+  Strict: 'Pause below 60, cooling-off on impulse buys',
+  Balanced: 'Place it, flag below 40, undo till dispatch',
+  Relaxed: 'Place it, show the score in your weekly summary'
+};
+
+let tab = 'home';
+let screen = 'home';
+let challenge = null;
+
+// Soch Score
+
+function sochScore(order) {
+  const total = Object.values(weights).reduce((a, b) => a + b, 0);
+  let points = 0;
+  for (const key in weights) points += weights[key] * order.factors[key].v;
+  return Math.round(points / total * 100);
+}
+
+function scoreColour(s) {
+  if (s >= 60) return 'var(--green)';
+  if (s >= 40) return 'var(--amber)';
+  return 'var(--red)';
+}
+
+function ring(score) {
+  const c = scoreColour(score);
+  return `<div class="ring" style="background: conic-gradient(${c} ${score * 3.6}deg, var(--line) 0)">
+            <div><span><b style="color:${c}">${score}</b><small>Soch Score</small></span></div>
+          </div>`;
+}
+
+// Screens
+
+function homeScreen() {
+  const s = sochScore(heldOrder);
+  const toReview = basket.review.filter(r => !r.ok).length;
+  const held = heldOrder.status === 'held';
+
+  return `
+    <p class="hello">Thu, 23 Oct 2040 · Hi ${user.name}</p>
+
+    <div class="card">
+      <div class="label">Soch Samajh Spend · October</div>
+      <div class="row">
+        <div class="big good">94%</div>
+        <div class="muted" style="text-align:right">₹41,280 of ₹43,900 your agent spent<br>was kept, not returned or regretted</div>
+      </div>
+    </div>
+
+    <div class="card clickable" onclick="go('order')">
+      <div class="row"><h3>Needs your yes</h3>${held ? '<span class="pill red">1 paused</span>' : '<span class="pill green">All clear</span>'}</div>
+      ${held ? `
+      <div class="list-item">
+        <div class="thumb">${heldOrder.emoji}</div>
+        <div class="grow"><div class="name">${heldOrder.item}</div>
+          <div class="muted">${rupee(heldOrder.price)} · added at ${heldOrder.addedAt}</div></div>
+        <b style="color:${scoreColour(s)}">${s}</b>
+      </div>` : `<p class="muted">${heldOrder.status === 'cancelled' ? 'You cancelled the earbuds. ₹14,999 saved.' : 'You confirmed the earbuds.'}</p>`}
+    </div>
+
+    <div class="card clickable" onclick="switchTab('basket')">
+      <div class="row"><h3>Today's basket</h3>${basket.confirmed ? '<span class="pill green">Confirmed</span>' : `<span class="pill amber">${toReview} to check</span>`}</div>
+      <p class="muted">${basket.staples.length} usual items + ${basket.review.length} new or changed · undo till dispatch</p>
+    </div>
+
+    <div class="card clickable" onclick="switchTab('security')">
+      <div class="row"><h3>Security</h3>${threat.status === 'blocked' ? '<span class="pill green">Blocked</span>' : '<span class="pill red">Action needed</span>'}</div>
+      <p class="muted">${rupee(threat.price)} order from a new device in Pune was stopped at 3 checkpoints</p>
+    </div>
+
+    <div class="card clickable" onclick="switchTab('data')">
+      <div class="row"><h3>Data shield</h3><span class="pill blue">On</span></div>
+      <p class="muted">38 orders this month · 0 full addresses or phone numbers shared · 2 data requests blocked</p>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <div><div class="label">Small spends this week</div><b>${rupee(1860)}</b> <span class="bad" style="font-size:12px">+31% vs last week</span></div>
+        <div style="text-align:right"><div class="label">Avg Soch Score</div><b>64 → 71</b> <span class="muted">in 90 days</span></div>
+      </div>
+    </div>`;
+}
+
+function orderScreen() {
+  const s = sochScore(heldOrder);
+  const done = heldOrder.status !== 'held';
+
+  const factors = Object.keys(weights).map(key => {
+    const f = heldOrder.factors[key];
+    return `
+      <div class="factor">
+        <div class="row"><b style="font-size:13px">${factorInfo[key].title}</b><span class="muted">${Math.round(f.v * weights[key])}/${weights[key]}</span></div>
+        <div class="meter"><i style="width:${f.v * 100}%; background:${scoreColour(f.v * 100)}"></i></div>
+        <div class="why">${f.why}</div>
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="card">
+      <div class="list-item" style="border:0; padding-top:0">
+        <div class="thumb" style="width:56px;height:56px;font-size:28px">${heldOrder.emoji}</div>
+        <div class="grow">
+          <div class="name">${heldOrder.item}</div>
+          <div><b>${rupee(heldOrder.price)}</b> <s class="muted">${rupee(heldOrder.mrp)}</s> <span class="pill green">${heldOrder.rating} ★</span></div>
+          <div class="muted">Agent added at ${heldOrder.addedAt} · ${heldOrder.note}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="score">
+        ${ring(s)}
+        <div>
+          ${s < 60
+            ? `<span class="pill red">Paused · Strict mode</span>
+               <p style="font-size:13px; margin-top:6px">Below your limit of 60 for Electronics. Held for a <b>24-hour cool-off</b>.</p>`
+            : `<span class="pill green">Above your limit</span>
+               <p style="font-size:13px; margin-top:6px">With your new rules this would go through normally.</p>`}
+        </div>
+      </div>
+    </div>
+
+    <div class="card"><h3>Why ${s}?</h3>${factors}
+    </div>
+
+    ${done ? `<div class="card"><b>${heldOrder.status === 'cancelled' ? 'Cancelled. ₹14,999 stays with you.' : 'Confirmed by you. Undo available till dispatch.'}</b></div>` : `
+    <div class="card">
+      <h3>Your decision</h3>
+      <button class="btn blue" onclick="cancelOrder()">Cancel order</button>
+      <p class="muted" style="margin-top:12px">Type the amount to confirm.</p>
+      <input type="text" id="amount" placeholder="Type 14999" oninput="checkAmount()">
+      <button class="btn orange" id="buy" disabled onclick="buyAnyway()">Confirm ${rupee(heldOrder.price)}</button>
+    </div>`}`;
+}
+
+function basketScreen() {
+  const reviewTotal = basket.review.filter(r => r.ok).reduce((a, r) => a + r.price, 0);
+  const staplesTotal = basket.staples.reduce((a, r) => a + r.price, 0);
+  const total = reviewTotal + (basket.staplesOk ? staplesTotal : 0);
+  const allChecked = basket.review.every(r => r.ok) && basket.staplesOk;
+
+  const reviewList = basket.review.map((r, i) => `
+    <div class="list-item clickable" onclick="toggleItem(${i})">
+      <div class="check ${r.ok ? 'on' : ''}"></div>
+      <div class="thumb">${r.emoji}</div>
+      <div class="grow"><div class="name">${r.name}</div><div class="warn" style="font-size:12px">${r.reason}</div></div>
+      <b>${rupee(r.price)}</b>
+    </div>`).join('');
+
+  const stapleList = basket.staples.map(r => `
+    <div class="list-item">
+      <div class="thumb">${r.emoji}</div>
+      <div class="grow"><div class="name">${r.name}</div></div>
+      <span>${rupee(r.price)}</span>
+    </div>`).join('');
+
+  if (basket.confirmed) {
+    return `<div class="card"><h3>Basket confirmed</h3>
+      <p class="muted">${rupee(total)} paid. Undo any item till dispatch.</p></div>`;
+  }
+
+  return `
+    <div class="card">
+      <div class="row"><b>Daily cap</b><span class="muted">${rupee(total)} of ${rupee(basket.cap)}</span></div>
+      <div class="cap"><i style="width:${Math.min(total / basket.cap * 100, 100)}%"></i></div>
+      <p class="muted">Anything over your cap needs its own confirmation.</p>
+    </div>
+
+    <div class="card">
+      <div class="row"><h3>New or changed</h3><span class="pill amber">Tick each one</span></div>
+      ${reviewList}
+    </div>
+
+    <div class="card">
+      <div class="row"><h3>Your usual staples</h3><span class="muted">${rupee(staplesTotal)}</span></div>
+      ${stapleList}
+      <button class="btn line" onclick="okStaples()">${basket.staplesOk ? '✓ Staples confirmed' : 'Confirm 4 unchanged staples'}</button>
+    </div>
+
+    <div class="card">
+      <div class="row"><b class="bad">Kept out of the basket</b></div>
+      <p class="muted">${basket.blocked.name} (${rupee(basket.blocked.price)}/yr). Add-ons are never bulk-confirmed.</p>
+    </div>
+
+    <button class="btn orange" ${allChecked ? '' : 'disabled'} onclick="payBasket()">Pay ${rupee(total)}</button>`;
+}
+
+function securityScreen() {
+  const steps = checkpoints.map(c => {
+    const cls = c.pass === true ? 'pass' : c.pass === false ? 'fail' : 'wait';
+    const icon = c.pass === true ? '✓' : c.pass === false ? '✕' : '…';
+    return `<div class="step"><div class="dot ${cls}">${icon}</div>
+              <div><b>${c.name}</b><div class="muted">${c.detail}</div></div></div>`;
+  }).join('');
+
+  let action = '';
+  if (threat.status === 'open') {
+    action = `
+      <button class="btn blue" onclick="blockThreat()">Not me. Block and lock my agent</button>
+      <button class="btn line" onclick="startChallenge()">This was me</button>`;
+  } else if (threat.status === 'challenge') {
+    action = challenge.type === 'face'
+      ? `<p style="margin-top:10px"><b>${challenge.ask}</b></p>
+         <button class="btn line" onclick="passChallenge()">Simulate face check</button>`
+      : `<p style="margin-top:10px"><b>${challenge.ask}</b></p>
+         ${challenge.hint ? `<p class="muted">${challenge.hint}</p>` : ''}
+         <input type="${challenge.type}" id="answer">
+         <button class="btn blue" onclick="checkAnswer()">Verify</button>
+`;
+  } else if (threat.status === 'blocked') {
+    action = `<p class="good" style="margin-top:10px"><b>Blocked. ₹0 left your account.</b></p>
+              <p class="muted">Your agent is locked until you re-bind it on your own phone.</p>`;
+  } else {
+    action = `<p class="good" style="margin-top:10px"><b>Verified. Order allowed, undo till dispatch.</b></p>`;
+  }
+
+  return `
+    <div class="card">
+      <div class="row"><span class="pill red">Stopped</span><span class="muted">${threat.at}</span></div>
+      <h3 style="margin-top:8px">${threat.item} · ${rupee(threat.price)}</h3>
+      <p class="muted">${threat.where}.</p>
+    </div>
+
+    <div class="card"><h3>Six checkpoints on every order</h3><div class="chain">${steps}</div></div>
+
+    <div class="card">${action}</div>
+
+    <div class="card row">
+      <div><div class="label">Attacks blocked</div><b>${threat.status === 'blocked' ? 3 : 2}</b> <span class="muted">this month</span></div>
+      <div style="text-align:right"><div class="label">Lost to fraud</div><b class="good">₹0</b></div>
+    </div>`;
+}
+
+function dataScreen() {
+  const rows = shared.map(s => `
+    <div class="list-item">
+      <div class="grow">
+        <div class="name">${s.seller}</div>
+        <div class="muted">Name: ${s.name} · Phone: ${s.phone}</div>
+        <div class="muted">Address: ${s.address}</div>
+      </div>
+    </div>`).join('');
+
+  const requests = dataRequests.map(r => `
+    <div class="list-item">
+      <div class="grow"><div class="name">${r.who} asked for ${r.asked.toLowerCase()}</div>
+        <div class="muted">In return: ${r.offer}</div></div>
+      <span class="pill red">Blocked</span>
+    </div>`).join('');
+
+  return `
+    <div class="card">
+      <div class="row"><h3>Share minimum</h3><span class="pill blue">On</span></div>
+      <p class="muted">Sellers get a masked phone and a one-time delivery token.</p>
+    </div>
+    <div class="card"><h3>What each seller saw</h3>${rows}</div>
+    <div class="card"><h3>Requests your agent turned down</h3>${requests}</div>`;
+}
+
+function rulesScreen() {
+  const cats = categories.map((c, i) => `
+    <div class="rule">
+      <b style="font-size:13px">${c.name}</b>
+      <div class="muted">${modeHelp[c.mode]}</div>
+      <div class="seg">${['Strict', 'Balanced', 'Relaxed'].map(m =>
+        `<button class="${c.mode === m ? 'on' : ''}" onclick="setMode(${i}, '${m}')">${m}</button>`).join('')}</div>
+    </div>`).join('');
+
+  const sliders = Object.keys(weights).map(key => `
+    <div style="margin-bottom:8px">
+      <div class="row"><span style="font-size:13px">${factorInfo[key].title}</span><b>${weights[key]}</b></div>
+      <input type="range" min="0" max="40" value="${weights[key]}" oninput="setWeight('${key}', this)">
+    </div>`).join('');
+
+  return `
+    <div class="card">
+      <h3>How strict, by category</h3>
+      ${cats}
+      <p class="muted">We'll suggest changes after 30 days.</p>
+    </div>
+
+    <div class="card">
+      <h3>Daily basket cap</h3>
+      <div class="row"><input type="range" min="1000" max="10000" step="500" value="${basket.cap}" oninput="setCap(this.value)"><b id="capValue">${rupee(basket.cap)}</b></div>
+    </div>
+
+    <div class="card">
+      <h3>Soch Score rules (public)</h3>
+      <p class="muted" style="margin-bottom:8px">Change what matters to you. The earbuds now score <b id="liveScore">${sochScore(heldOrder)}</b>.</p>
+      ${sliders}
+    </div>
+
+    <div class="card">
+      <h3>Your staples</h3>
+      <p class="muted">Only these can be confirmed in bulk. Your agent can suggest, never add.</p>
+      ${basket.staples.map(s => `<div class="list-item"><div class="thumb">${s.emoji}</div><div class="grow name">${s.name}</div></div>`).join('')}
+    </div>`;
+}
+
+// Button actions
+
+function cancelOrder() {
+  heldOrder.status = 'cancelled';
+  toast('Cancelled. ₹14,999 stays in your account');
+  render();
+}
+
+function checkAmount() {
+  document.getElementById('buy').disabled = document.getElementById('amount').value.trim() !== String(heldOrder.price);
+}
+
+function buyAnyway() {
+  heldOrder.status = 'confirmed';
+  toast('Confirmed by you. Undo till dispatch');
+  render();
+}
+
+function toggleItem(i) {
+  basket.review[i].ok = !basket.review[i].ok;
+  render();
+}
+
+function okStaples() {
+  basket.staplesOk = !basket.staplesOk;
+  render();
+}
+
+function payBasket() {
+  basket.confirmed = true;
+  toast('Basket paid. Undo till dispatch');
+  render();
+}
+
+function blockThreat() {
+  threat.status = 'blocked';
+  checkpoints[3].pass = false;
+  checkpoints[3].detail = 'You said it wasn\'t you';
+  toast('Blocked. Agent locked');
+  render();
+}
+
+function startChallenge() {
+  challenge = challenges[Math.floor(Math.random() * challenges.length)];
+  threat.status = 'challenge';
+  render();
+}
+
+function checkAnswer() {
+  const value = document.getElementById('answer').value.trim();
+  if (value === challenge.answer) passChallenge();
+  else {
+    threat.status = 'blocked';
+    checkpoints[3].pass = false;
+    checkpoints[3].detail = 'Check failed, so the order was blocked';
+    toast('Wrong answer. Order blocked');
+    render();
+  }
+}
+
+function passChallenge() {
+  threat.status = 'allowed';
+  checkpoints[3].pass = true;
+  checkpoints[3].detail = 'Passed';
+  checkpoints[4].detail = 'Payment held until dispatch';
+  toast('Verified');
+  render();
+}
+
+function setMode(i, mode) {
+  categories[i].mode = mode;
+  render();
+}
+
+function setCap(value) {
+  basket.cap = Number(value);
+  document.getElementById('capValue').textContent = rupee(basket.cap);
+}
+
+function setWeight(key, slider) {
+  weights[key] = Number(slider.value);
+  slider.parentElement.querySelector('b').textContent = slider.value;
+  document.getElementById('liveScore').textContent = sochScore(heldOrder);
+}
+
+// Navigation
+
+const screens = {
+  home: [homeScreen, 'Sochkart'],
+  order: [orderScreen, 'Paused order'],
+  basket: [basketScreen, "Today's basket"],
+  security: [securityScreen, 'Security'],
+  data: [dataScreen, 'Data shield'],
+  rules: [rulesScreen, 'Rules']
+};
+
+function render() {
+  const [draw, title] = screens[screen];
+  document.getElementById('screen').innerHTML = draw();
+  document.getElementById('title').textContent = title;
+  document.getElementById('back').hidden = screen !== 'order';
+  document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
+}
+
+function go(name) {
+  screen = name;
+  render();
+  document.getElementById('screen').scrollTop = 0;
+}
+
+function switchTab(name) {
+  tab = name;
+  go(name);
+}
+
+function toast(message) {
+  const t = document.getElementById('toast');
+  t.textContent = message;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+document.getElementById('tabs').addEventListener('click', e => {
+  const button = e.target.closest('button');
+  if (button) switchTab(button.dataset.tab);
+});
+
+document.getElementById('back').addEventListener('click', () => switchTab('home'));
+
+render();
+</script>
+</body>
+</html>
